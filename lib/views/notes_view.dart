@@ -10,6 +10,8 @@ enum MenuAction { logout }
 class NotesView extends StatefulWidget {
   const NotesView({Key? key}) : super(key: key);
 
+  static const routeName = 'notes_view';
+
   @override
   _NotesViewState createState() => _NotesViewState();
 }

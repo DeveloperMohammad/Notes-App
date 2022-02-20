@@ -23,6 +23,7 @@ void main() async {
       routes: {
         HomePage.routeName: (context) => const HomePage(),
         LoginView.routeName: (context) => const LoginView(),
+        NotesView.routeName: (context) => const NotesView(),
         RegisterView.routeName: (context) => const RegisterView(),
       },
     ),
