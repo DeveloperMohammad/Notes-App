@@ -25,10 +25,6 @@ void main() async {
   );
 }
 
-extension HardCoded on String {
-  String get hardcoded => '$this MMM';
-}
-
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
