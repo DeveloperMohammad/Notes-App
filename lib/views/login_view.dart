@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
 
 import '../main.dart';
 import '../views/register_view.dart';
@@ -17,6 +16,8 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -38,7 +39,7 @@ class _LoginViewState extends State<LoginView> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: Column(
+      body: isLoading ? const Center(child: CircularProgressIndicator()) : Column(
         children: [
           TextField(
             controller: _emailController,
@@ -58,6 +59,7 @@ class _LoginViewState extends State<LoginView> {
           ),
           TextButton(
             onPressed: () async {
+              setState(() => isLoading = true);
               final email = _emailController.text;
               final password = _passwordController.text;
               try {
@@ -67,7 +69,8 @@ class _LoginViewState extends State<LoginView> {
                   password: password,
                 );
                 print(userCredential);
-                Get.to(const HomePage());
+                Navigator.of(context).pushReplacementNamed(HomePage.routeName);
+                setState(() => isLoading = false);
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-not-found') {
                   print('User Not Found');

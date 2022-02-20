@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
 
 import '/views/login_view.dart';
 
@@ -66,7 +65,7 @@ class _RegisterViewState extends State<RegisterView> {
                   password: password,
                 );
                 print(userCredential);
-                Get.to(const LoginView());
+                Navigator.of(context).pushNamed(LoginView.routeName);
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'weak-password') {
                   print('Weak Password');
