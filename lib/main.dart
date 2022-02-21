@@ -25,6 +25,7 @@ void main() async {
         LoginView.routeName: (context) => const LoginView(),
         NotesView.routeName: (context) => const NotesView(),
         RegisterView.routeName: (context) => const RegisterView(),
+        VerifyEmailView.routeName: (context) => const VerifyEmailView(),
       },
     ),
   );

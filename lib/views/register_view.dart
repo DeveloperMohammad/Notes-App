@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer' as devtool show log;
+import 'package:notes/utilities/show_error_dialog.dart';
+import 'package:notes/views/verify_email_view.dart';
 
 import '/views/login_view.dart';
 
@@ -60,28 +61,51 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _emailController.text;
               final password = _passwordController.text;
               try {
-                final userCredential =
-                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
-                devtool.log(userCredential.toString());
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email, password: password);
+                final user = FirebaseAuth.instance.currentUser;
+                await user?.sendEmailVerification();
                 Navigator.of(context).pushNamed(LoginView.routeName);
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'weak-password') {
-                  devtool.log('Weak Password');
+                  await showErrorDialog(
+                      context: context,
+                      title: 'Register Error',
+                      content: 'The password you entered is weak');
                 } else if (e.code == 'email-already-in-use') {
-                  devtool.log('Email Already In Use');
+                  await showErrorDialog(
+                      context: context,
+                      title: 'Register Error',
+                      content: 'Email is Already in use');
                 } else if (e.code == 'invalid-email') {
-                  devtool.log('Email is Invalid');
+                  await showErrorDialog(
+                      context: context,
+                      title: 'Register Error',
+                      content: 'Email is Invalid');
+                } else if (e.code == 'network-request-failed') {
+                  await showErrorDialog(
+                      context: context,
+                      title: 'Register Error',
+                      content: 'Failed to connect to internet');
+                } else {
+                  await showErrorDialog(
+                      context: context,
+                      title: 'Register Error',
+                      content: 'Error: ${e.code}');
                 }
+              } catch (e) {
+                await showErrorDialog(
+                    context: context,
+                    title: 'Unknown error',
+                    content: e.toString());
               }
             },
             child: const Text('Register'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil(LoginView.routeName, (route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  LoginView.routeName, (route) => false);
             },
             child: const Text('Already Registered? Login here!'),
           ),
