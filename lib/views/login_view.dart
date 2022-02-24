@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:notes/services/auth/auth_exceptions.dart';
+import 'package:notes/services/auth/auth_service.dart';
 import 'package:notes/views/notes_view.dart';
 import 'package:notes/views/verify_email_view.dart';
 
-import '../main.dart';
 import '../utilities/show_error_dialog.dart';
 import '../views/register_view.dart';
 
@@ -68,58 +68,53 @@ class _LoginViewState extends State<LoginView> {
                     final email = _emailController.text;
                     final password = _passwordController.text;
                     try {
-                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      await AuthService.firebase().logIn(
                         email: email,
                         password: password,
                       );
-                      final user = FirebaseAuth.instance.currentUser;
-                      if (user?.emailVerified ?? false) {
-                        // user's email is verified
+                      final user = AuthService.firebase().currentUser;
+                      if (user?.isEmailVerified ?? false) {
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                            NotesView.routeName, (route) => false);
+                          NotesView.routeName,
+                          (route) => false,
+                        );
                       } else {
-                        // user's email is not verified
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                            VerifyEmailView.routeName, (route) => false);
+                          VerifyEmailView.routeName,
+                          (route) => false,
+                        );
                       }
                       setState(() => isLoading = false);
-                      // Navigator.of(context).pushNamedAndRemoveUntil(
-                      //     HomePage.routeName, (route) => false);
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == 'user-not-found') {
-                        // if user credential is wrong
-                        await showErrorDialog(
-                            context: context,
-                            title: 'Login Error',
-                            content: 'The email you entered doesn\'t exist');
-                        setState(() => isLoading = false);
-                      } else if (e.code == 'wrong-password') {
-                        // if password entered is wrong
-                        await showErrorDialog(
-                            context: context,
-                            title: 'Login Error',
-                            content: 'The password you entered is incorret');
-                        setState(() => isLoading = false);
-                      } else if (e.code == 'network-request-failed') {
-                        // if your internet connection fails
-                        await showErrorDialog(
-                            context: context,
-                            title: 'Network Issue',
-                            content: 'Your connection time out!');
-                        setState(() => isLoading = false);
-                      } else {
-                        await showErrorDialog(
-                            context: context,
-                            title: 'Error',
-                            content: 'Error: ${e.code}');
-                        setState(() => isLoading = false);
-                      }
-                    } catch (e) {
+                    } on UserNotFoundAuthException {
                       await showErrorDialog(
-                          context: context,
-                          title: 'Error',
-                          content: e.toString());
+                        context: context,
+                        title: 'Login Error',
+                        content: 'The email you entered doesn\'t exist',
+                      );
                       setState(() => isLoading = false);
+                    } on WrongPasswordAuthException {
+                      await showErrorDialog(
+                        context: context,
+                        title: 'Login Error',
+                        content: 'The password you entered is incorret',
+                      );
+                      setState(() => isLoading = false);
+                    } on NetworkRequestFailedAuthException {
+                      await showErrorDialog(
+                        context: context,
+                        title: 'Network Issue',
+                        content: 'Your connection time out!',
+                      );
+                      setState(() => isLoading = false);
+                    } on GenericAuthException {
+                      await showErrorDialog(
+                        context: context,
+                        title: 'Error',
+                        content: 'Authentication Error',
+                      );
+                      setState(
+                        () => isLoading = false,
+                      );
                     }
                   },
                   child: const Text('Login'),

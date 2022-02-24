@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:notes/utilities/show_error_dialog.dart';
-import 'package:notes/views/verify_email_view.dart';
+import 'package:notes/services/auth/auth_exceptions.dart';
+import 'package:notes/services/auth/auth_service.dart';
 
+import '/utilities/show_error_dialog.dart';
 import '/views/login_view.dart';
 
 class RegisterView extends StatefulWidget {
@@ -61,43 +61,42 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _emailController.text;
               final password = _passwordController.text;
               try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                    email: email, password: password);
-                final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
+                await AuthService.firebase().createUser(
+                  email: email,
+                  password: password,
+                );
+                await AuthService.firebase().sendEmailVerification();
                 Navigator.of(context).pushNamed(LoginView.routeName);
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'weak-password') {
-                  await showErrorDialog(
-                      context: context,
-                      title: 'Register Error',
-                      content: 'The password you entered is weak');
-                } else if (e.code == 'email-already-in-use') {
-                  await showErrorDialog(
-                      context: context,
-                      title: 'Register Error',
-                      content: 'Email is Already in use');
-                } else if (e.code == 'invalid-email') {
-                  await showErrorDialog(
-                      context: context,
-                      title: 'Register Error',
-                      content: 'Email is Invalid');
-                } else if (e.code == 'network-request-failed') {
-                  await showErrorDialog(
-                      context: context,
-                      title: 'Register Error',
-                      content: 'Failed to connect to internet');
-                } else {
-                  await showErrorDialog(
-                      context: context,
-                      title: 'Register Error',
-                      content: 'Error: ${e.code}');
-                }
-              } catch (e) {
+              } on WeakPasswordAuthException {
                 await showErrorDialog(
-                    context: context,
-                    title: 'Unknown error',
-                    content: e.toString());
+                  context: context,
+                  title: 'Register Error',
+                  content: 'The password you entered is weak',
+                );
+              } on EmailAlreadyInUseAuthException {
+                await showErrorDialog(
+                  context: context,
+                  title: 'Register Error',
+                  content: 'Email is Already in use',
+                );
+              } on InvalidEmailAuthException {
+                await showErrorDialog(
+                  context: context,
+                  title: 'Register Error',
+                  content: 'Email is Invalid',
+                );
+              } on NetworkRequestFailedAuthException {
+                await showErrorDialog(
+                  context: context,
+                  title: 'Register Error',
+                  content: 'Failed to connect to internet',
+                );
+              } on GenericAuthException {
+                await showErrorDialog(
+                  context: context,
+                  title: 'Register Error',
+                  content: 'Failed to Register',
+                );
               }
             },
             child: const Text('Register'),
