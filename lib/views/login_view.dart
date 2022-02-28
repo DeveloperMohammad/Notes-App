@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes/services/auth/auth_exceptions.dart';
 import 'package:notes/services/auth/auth_service.dart';
-import 'package:notes/views/notes_view.dart';
+import 'package:notes/views/notes/notes_view.dart';
 import 'package:notes/views/verify_email_view.dart';
 
 import '../utilities/show_error_dialog.dart';
