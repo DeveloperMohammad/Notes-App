@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notes/services/crud/notes_service.dart';
 
 import 'dart:developer' as devtools show log;
 
@@ -16,6 +17,21 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
+  late final NotesService _notesService;
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  @override
+  void initState() {
+    _notesService = NotesService();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,15 +68,24 @@ class _NotesViewState extends State<NotesView> {
           ),
         ],
       ),
-      body: const Center(
-        child: Text(
-          'Done',
-          style: TextStyle(
-            fontSize: 50,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      body: FutureBuilder(
+          future: _notesService.getOrCreateUser(email: userEmail),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return StreamBuilder(
+                stream: _notesService.allNotes,
+                builder: (context, snapshot) {
+                  if(snapshot.connectionState == ConnectionState.waiting) {
+                    return const Text('I guess notes will appear here');
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          }),
     );
   }
 }
