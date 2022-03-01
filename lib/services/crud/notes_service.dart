@@ -13,11 +13,16 @@ class NotesService {
   List<DatabaseNote> _notes = [];
 
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      }
+    );
+  }
   factory NotesService() => _shared;
 
-  final _notesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
 
@@ -49,7 +54,7 @@ class NotesService {
     // update DB
     final updateCount = await db.update(noteTable, {
       textColumn: text,
-      isSyncedColumn: 0,
+      isSyncedWithCloudColumn: 0,
     });
 
     if (updateCount == 0) {
@@ -63,7 +68,7 @@ class NotesService {
     }
   }
 
-Future<Iterable<DatabaseNote>> getUserNotes({required String email}) async {
+  Future<Iterable<DatabaseNote>> getUserNotes({required String email}) async {
   final db = _getDatabaseOrThrow();
   final notes = await db.query(noteTable, where: '$email = ?', whereArgs: [email]);
 
@@ -214,7 +219,7 @@ Future<Iterable<DatabaseNote>> getUserNotes({required String email}) async {
     final noteId = await db.insert(noteTable, {
       userIdColumn: owner.id,
       textColumn: text,
-      isSyncedColumn: 1,
+      isSyncedWithCloudColumn: 1,
     });
 
     final note = DatabaseNote(
@@ -294,7 +299,7 @@ class DatabaseNote {
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
         text = map[textColumn] as String,
-        isSyncedWithCloud = (map[isSyncedColumn] as int) == 1 ? true : false;
+        isSyncedWithCloud = (map[isSyncedWithCloudColumn] as int) == 1 ? true : false;
 
   @override
   String toString() =>
@@ -315,7 +320,7 @@ const idColumn = 'id';
 const emailColumn = 'email';
 const userIdColumn = 'user_id';
 const textColumn = 'text';
-const isSyncedColumn = 'is_synced_with_cloud';
+const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 
 // create user table
 const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
@@ -325,7 +330,7 @@ const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
 );''';
 
 // create note table
-const createNoteTable = '''CREATE TABLE IF NOTE EXISTS "note" (
+const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
   "id"	INTEGER NOT NULL,
   "user_id"	INTEGER NOT NULL,
   "text"	TEXT,

@@ -20,7 +20,7 @@ void main() async {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginView(),
+      home: const HomePage(),
       routes: {
         HomePage.routeName: (context) => const HomePage(),
         LoginView.routeName: (context) => const LoginView(),
