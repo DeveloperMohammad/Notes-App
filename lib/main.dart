@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
 import 'views/login_view.dart';
-import 'views/notes/new_note_view.dart';
+import 'views/notes/create_update_note_view.dart';
 import 'views/notes/notes_view.dart';
 import 'views/register_view.dart';
 import 'views/verify_email_view.dart';
@@ -27,7 +27,7 @@ void main() async {
         NotesView.routeName: (context) => const NotesView(),
         RegisterView.routeName: (context) => const RegisterView(),
         VerifyEmailView.routeName: (context) => const VerifyEmailView(),
-        NewNoteView.routeName: (context) => const NewNoteView(),
+        CreateOrUpdateNoteView.routeName: (context) => const CreateOrUpdateNoteView(),
       },
     ),
   );
