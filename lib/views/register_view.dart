@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:notes/services/auth/auth_exceptions.dart';
-import 'package:notes/services/auth/auth_service.dart';
 
-import '/utilities/show_error_dialog.dart';
+import '/services/auth/auth_exceptions.dart';
+import '/services/auth/auth_service.dart';
+import '../utilities/dialogs/error_dialog.dart';
 import '/views/login_view.dart';
 
 class RegisterView extends StatefulWidget {
@@ -69,33 +69,28 @@ class _RegisterViewState extends State<RegisterView> {
                 Navigator.of(context).pushNamed(LoginView.routeName);
               } on WeakPasswordAuthException {
                 await showErrorDialog(
-                  context: context,
-                  title: 'Register Error',
-                  content: 'The password you entered is weak',
+                  context,
+                  'The password you entered is weak',
                 );
               } on EmailAlreadyInUseAuthException {
                 await showErrorDialog(
-                  context: context,
-                  title: 'Register Error',
-                  content: 'Email is Already in use',
+                  context,
+                  'Email is Already in use',
                 );
               } on InvalidEmailAuthException {
                 await showErrorDialog(
-                  context: context,
-                  title: 'Register Error',
-                  content: 'Email is Invalid',
+                  context,
+                  'Email is Invalid',
                 );
               } on NetworkRequestFailedAuthException {
                 await showErrorDialog(
-                  context: context,
-                  title: 'Register Error',
-                  content: 'Failed to connect to internet',
+                  context,
+                  'Failed to connect to internet',
                 );
               } on GenericAuthException {
                 await showErrorDialog(
-                  context: context,
-                  title: 'Register Error',
-                  content: 'Failed to Register',
+                  context,
+                  'Failed to Register',
                 );
               }
             },

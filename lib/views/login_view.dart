@@ -4,7 +4,7 @@ import 'package:notes/services/auth/auth_service.dart';
 import 'package:notes/views/notes/notes_view.dart';
 import 'package:notes/views/verify_email_view.dart';
 
-import '../utilities/show_error_dialog.dart';
+import '../utilities/dialogs/error_dialog.dart';
 import '../views/register_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -87,30 +87,26 @@ class _LoginViewState extends State<LoginView> {
                       setState(() => isLoading = false);
                     } on UserNotFoundAuthException {
                       await showErrorDialog(
-                        context: context,
-                        title: 'Login Error',
-                        content: 'The email you entered doesn\'t exist',
+                        context,
+                        'The email you entered doesn\'t exist',
                       );
                       setState(() => isLoading = false);
                     } on WrongPasswordAuthException {
                       await showErrorDialog(
-                        context: context,
-                        title: 'Login Error',
-                        content: 'The password you entered is incorret',
+                        context,
+                        'The password you entered is incorret',
                       );
                       setState(() => isLoading = false);
                     } on NetworkRequestFailedAuthException {
                       await showErrorDialog(
-                        context: context,
-                        title: 'Network Issue',
-                        content: 'Your connection time out!',
+                        context,
+                        'Your connection time out!',
                       );
                       setState(() => isLoading = false);
                     } on GenericAuthException {
                       await showErrorDialog(
-                        context: context,
-                        title: 'Error',
-                        content: 'Authentication Error',
+                        context,
+                        'Authentication Error',
                       );
                       setState(
                         () => isLoading = false,
