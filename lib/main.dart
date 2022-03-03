@@ -12,8 +12,8 @@ import 'services/auth/auth_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -27,7 +27,8 @@ void main() async {
         NotesView.routeName: (context) => const NotesView(),
         RegisterView.routeName: (context) => const RegisterView(),
         VerifyEmailView.routeName: (context) => const VerifyEmailView(),
-        CreateOrUpdateNoteView.routeName: (context) => const CreateOrUpdateNoteView(),
+        CreateOrUpdateNoteView.routeName: (context) =>
+            const CreateOrUpdateNoteView(),
       },
     ),
   );
