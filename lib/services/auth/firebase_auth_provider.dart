@@ -78,7 +78,7 @@ class FirebaseAuthProvider implements AuthProvider {
         throw NetworkRequestFailedAuthException();
       } 
       else {
-        throw UserNotFoundAuthException();
+        throw GenericAuthException();
       }
     } 
     catch (_) {

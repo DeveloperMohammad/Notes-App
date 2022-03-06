@@ -7,13 +7,14 @@ class FirebaseCloudStorage {
   // first we create a private constructor
   FirebaseCloudStorage._sharedInstance();
 
-  // then we create a factory constructor that's the default constructor for our class
-  // and that's gonna talk with static final field that in turn calls a private initializer.
-  factory FirebaseCloudStorage() => _shared;
 
   /// static final constructor guy
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._sharedInstance();
+
+  // then we create a factory constructor that's the default constructor for our class
+  // and that's gonna talk with static final field that in turn calls a private initializer.
+  factory FirebaseCloudStorage() => _shared;
 
   // talk with firestore
   final notes = FirebaseFirestore.instance.collection('notes');
