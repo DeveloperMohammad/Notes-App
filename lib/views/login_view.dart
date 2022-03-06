@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../services/auth/bloc/auth_state.dart';
 import '/services/auth/auth_exceptions.dart';
 import '/services/auth/bloc/auth_bloc.dart';
 import '/services/auth/bloc/auth_event.dart';
@@ -19,8 +20,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
-
-  bool isLoading = false;
 
   @override
   void initState() {
@@ -42,9 +41,7 @@ class _LoginViewState extends State<LoginView> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
+      body: Column(
               children: [
                 TextField(
                   controller: _emailController,
@@ -62,47 +59,33 @@ class _LoginViewState extends State<LoginView> {
                     hintText: 'Enter your password',
                   ),
                 ),
-                TextButton(
-                  onPressed: () async {
-                    setState(() => isLoading = true);
-                    final email = _emailController.text;
-                    final password = _passwordController.text;
-                    try {
-                      context.read<AuthBloc>().add(
-                            AuthEventLogin(
-                              email: email,
-                              password: password,
-                            ),
-                          );
-                    } on UserNotFoundAuthException {
-                      await showErrorDialog(
-                        context,
-                        'The email you entered doesn\'t exist',
-                      );
-                      setState(() => isLoading = false);
-                    } on WrongPasswordAuthException {
-                      await showErrorDialog(
-                        context,
-                        'The password you entered is incorret',
-                      );
-                      setState(() => isLoading = false);
-                    } on NetworkRequestFailedAuthException {
-                      await showErrorDialog(
-                        context,
-                        'Your connection time out!',
-                      );
-                      setState(() => isLoading = false);
-                    } on GenericAuthException {
-                      await showErrorDialog(
-                        context,
-                        'Authentication Error',
-                      );
-                      setState(
-                        () => isLoading = false,
-                      );
+                BlocListener<AuthBloc, AuthState>(
+                  listener: (context, state) async {
+                    if (state is AuthStateLoggedOut) {
+                      if (state.exception is UserNotFoundAuthException) {
+                        await showErrorDialog(context, 'User Not Found');
+                      } else if (state.exception
+                          is WrongPasswordAuthException) {
+                        await showErrorDialog(
+                            context, 'Wrong Credential Error');
+                      } else if (state.exception
+                          is NetworkRequestFailedAuthException) {
+                        await showErrorDialog(
+                            context, 'Cannot connect to the internet');
+                      } else if (state.exception is GenericAuthException) {
+                        await showErrorDialog(context, 'Authentication Error');
+                      }
                     }
                   },
-                  child: const Text('Login'),
+                  child: TextButton(
+                    onPressed: () async {
+                      final email = _emailController.text;
+                      final password = _passwordController.text;
+                      context.read<AuthBloc>().add(
+                          AuthEventLogin(email: email, password: password));
+                    },
+                    child: const Text('Login'),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
