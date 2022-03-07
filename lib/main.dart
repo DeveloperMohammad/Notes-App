@@ -29,13 +29,7 @@ void main() async {
         child: const HomePage(),
       ),
       routes: {
-        HomePage.routeName: (context) => const HomePage(),
-        LoginView.routeName: (context) => const LoginView(),
-        NotesView.routeName: (context) => const NotesView(),
-        RegisterView.routeName: (context) => const RegisterView(),
-        VerifyEmailView.routeName: (context) => const VerifyEmailView(),
-        CreateOrUpdateNoteView.routeName: (context) =>
-            const CreateOrUpdateNoteView(),
+        CreateOrUpdateNoteView.routeName: (context) => const CreateOrUpdateNoteView(),
       },
     ),
   );
@@ -57,7 +51,10 @@ class HomePage extends StatelessWidget {
           return const VerifyEmailView();
         } else if (state is AuthStateLoggedOut) {
           return const LoginView();
-        } else {
+        } else if(state is AuthStateRegistering) {
+          return const RegisterView();
+        } 
+        else {
           return const Scaffold(
             backgroundColor: Colors.blue,
             body: Center(
